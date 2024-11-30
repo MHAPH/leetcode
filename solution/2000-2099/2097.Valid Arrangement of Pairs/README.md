@@ -89,6 +89,49 @@ end<sub>1</sub> = 1 == 1 = start<sub>2</sub>
 #### Python3
 
 ```python
+from collections import defaultdict
+
+class Solution:
+    def validArrangement(self, pairs):
+        # Step 1: Create adjacency list and degree counters
+        graph = defaultdict(list)  # Each node points to a list of connected nodes
+        indegree = defaultdict(int)  # Keeps track of the in-degrees of nodes
+        outdegree = defaultdict(int)  # Keeps track of the out-degrees of nodes
+        
+        # Step 2: Build the graph and the degree counts
+        for start, end in pairs:
+            graph[start].append(end)
+            outdegree[start] += 1
+            indegree[end] += 1
+        
+        # Step 3: Find the starting node
+        start_node = pairs[0][0]  # Default start node is the first node of the first pair
+        
+        # Find the actual start node (node with outdegree > indegree)
+        for node in outdegree:
+            if outdegree[node] - indegree[node] == 1:
+                start_node = node
+                break
+        
+        # Step 4: Hierholzer's algorithm to find the Eulerian path
+        result = []
+        stack = [start_node]
+        
+        while stack:
+            node = stack[-1]
+            
+            if graph[node]:  # If there are still edges to traverse from this node
+                # Continue to the next node (pop from the adjacency list)
+                next_node = graph[node].pop()
+                stack.append(next_node)
+            else:
+                # No more edges to follow from this node, add the pair to result
+                stack.pop()
+                if stack:
+                    result.append([stack[-1], node])
+        
+        # Step 5: Reverse the result because we collected it in reverse order
+        return result[::-1]
 
 ```
 
